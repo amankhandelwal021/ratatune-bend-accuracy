@@ -1,65 +1,85 @@
-# Ratatune — live bend accuracy
+# Ratatune — React bend accuracy landing page
 
-Updated to reflect Amrita’s clarification: the feature is pre-launch, and a simple functioning microphone demo is the proof.
+A complete React + Vite project. The existing design, branding, copy, three content sections, live microphone prototype, early-access form, and scroll-driven harmonica are preserved. The page is composed of JSX components; state and browser resources are managed by React hooks. There is no parallel legacy HTML/JavaScript implementation to maintain.
 
-Open `index.html` in a browser, or serve this folder with any static web server. For microphone use, HTTPS or localhost is the recommended environment. There are no installation steps, dependencies, remote fonts, stock photos, or tracking scripts.
+## Run locally
+
+Use Node.js 20.19+ or 22.12+ (Node 24 is supported).
 
 ```sh
-python3 -m http.server 4173 --bind 127.0.0.1
+npm ci
+npm run dev
 ```
 
-Then open <http://127.0.0.1:4173>.
+Open **http://127.0.0.1:4173/**. If another preview already occupies that port, stop it first or use `npm run dev -- --port 5173`.
 
-## Included
+```sh
+npm run build
+npm run preview
+```
 
-- `index.html`, `styles.css`, `app.js`, `pitch.js`, and the favicon: editable page source.
-- `harmonica-motion.js`, `harmonica-motion.css`, and `assets/harmonica.svg`: the independent scroll interaction and instrument artwork. The SVG is embedded in the HTML so no fetch is needed.
-- `Interaction.png` and `Mobile interaction.png`: desktop and mobile views of the harmonica between sections.
-- `Desktop.png`, `Mobile.png`, and `Early access form.png`: current rendered views.
-- `Submission notes.md`: the required four-sentence design explanation.
-- The submission ZIP also includes `Ratatune.html`, a self-contained version.
+The production build is in `dist/`. Deploy that folder to a static host using HTTPS for microphone access. The build pre-renders the React components into HTML, then hydrates them in the browser. This keeps the page readable before JavaScript loads or when it is disabled. The development server renders on the client. Opening the source `index.html` directly is not a supported preview; use Vite or the generated `Ratatune.html`.
 
-## The live demo
+## Project structure
 
-One target and one live cents reading. Get Early Access is the primary conversion action; the outlined microphone button operates the proof demo. The microphone button sits directly below the target settings, before the reading, in both visual and keyboard order. The default is a C-harp 3-draw whole-step bend: A4 at 440 Hz. “Change harp or bend” reveals seven harp keys and three bend targets. A target change clears the old reading and keeps an active mic running.
+- `src/App.jsx`: page composition, shared early-access state, microphone hook.
+- `src/components/`: header, hero, live bend demo, bend strip, explanation, invitation/FAQ, footer, dialog, and harmonica artwork/scene.
+- `src/hooks/useMicrophonePitch.js`: React target/reading state and lifecycle cleanup.
+- `src/lib/microphone.js`: capture session, cancellation, device handling, and analysis scheduling.
+- `src/lib/pitch.js`: pure YIN detector and pitch conversion functions.
+- `src/hooks/useHarmonicaMotion.js` and `src/lib/harmonica-motion.js`: the existing measured scroll timeline, scoped to this React tree, with listener, observer, and animation-frame cleanup.
+- `src/styles/`: the existing page styling and harmonica styling, formatted for editing.
+- `public/assets/favicon.svg`: local brand asset. The harmonica SVG is JSX in `HarmonicaArtwork.jsx`.
+- `src/entry-server.jsx` and `scripts/prerender.mjs`: static HTML generated from the same React components.
+- `tests/`: detector/capture unit tests and Playwright browser scenarios.
 
-“Use my mic” requests permission and begins on-device audio analysis. The displayed number comes from the microphone waveform using a simple YIN detector. It reports a signed cents offset and a plain-language direction: flat, sharp, or on target. Silence clears the number. The pitch readout never uses generated or predefined demonstration values; microphone audio is not played back, recorded, or uploaded.
+## Live microphone proof
 
-The mic stops when the user chooses Stop mic, opens the early-access form, backgrounds the page, or navigates away. A pending permission request can be cancelled, and any stream that arrives after cancellation is immediately released.
+One target and one signed cents reading. The default is a C-harp 3-draw whole-step bend, A4 at 440 Hz. “Change harp or bend” reveals seven harp keys and three bend targets. Changing the target clears the old reading without stopping an active microphone.
 
-The page clearly says “Browser prototype.” It is not Ratatune’s shipped product or its proprietary audio engine. Equal temperament at A4 = 440 Hz and a ±5-cent visual guide are prototype choices. The detector expects a single stable note; chords, background music, alternate tunings, and instrument harmonics need real-player validation.
+“Use my mic” requests permission. The detector analyzes waveform samples on the device; it never uses predefined demonstration readings, records audio, plays audio through speakers, or uploads it. Silence clears the display. Stop mic, opening the lead form, backgrounding the page, navigating away, and component unmount release the capture resources. Late permission responses after cancellation are discarded. Development runs in React Strict Mode to exercise effect cleanup.
 
-## Scroll interaction
+“Browser prototype” stays clearly visible. This is not Ratatune’s shipped feature or proprietary engine. A4 = 440 Hz and the ±5-cent guide are prototype choices. Physical-instrument validation remains pending: no harmonica was available. Generated-signal and simulated-input tests do not establish accuracy with an actual harmonica.
 
-One reversible timeline runs through the existing sections. The complete instrument begins in the hero; the C-harp bend strip brings a close-up of hole 3; the existing explanation reveals the paired reed plates and schematic draw airflow; the final invitation returns it to an assembled view. There are no new content sections, labels, or changes to the original page copy, spacing, type, branding, or form. The enlarged view is an instrument illustration, not a product screenshot or a second pitch reading.
+## Harmonica interaction
 
-Scroll controls camera position, magnification, the cover separation, airflow marks, and small reed movements. Hover adds a slight tilt. Clicking, tapping, or pressing Enter/Space toggles the covers; Escape closes them, and further scrolling resumes the timeline. Between sections, the model contracts within the available space before moving and rotating through the outer gutter, so it stays visible without covering content. The third chamber’s live color still uses only actual detected microphone input; scroll-driven airflow/reed movements are schematic and do not represent recorded audio or measured vibration frequency.
+The same instrument follows a reversible scroll timeline through the existing layout: assembled in the hero, a hole-3 close-up near the C-harp bend strip, paired reeds and schematic draw airflow near the explanation, and reassembly near the final invitation. No new section or copy was introduced.
 
-Reduced motion keeps a static assembled instrument, with optional manual inspection. The layer hides for the lead form and stops rendering in a hidden tab. Original content nodes match the previous page exactly. Across 85 sampled scroll positions at 320, 390, 768, 1024, and 1440px, there were no in-view disappearances, content overlaps, or horizontal overflow. Scroll reversal, keyboard controls, reduced motion, and automated accessibility checks passed. The original pitch and form code is unchanged.
+Hover adds a slight tilt. Click, tap, or Enter/Space toggles inspection; Escape closes it; scrolling resumes the timeline. The instrument travels through measured empty spaces and the outer gutter to stay clear of the content. Reduced motion keeps it assembled and static with optional manual inspection. Its live color reflects microphone input; the scroll-driven reed and airflow illustration is schematic, not an acoustic measurement.
 
-The paired-reed illustration follows [HOHNER’s explanation of bending](https://my.hohner.de/t/harmonica-terminology-3-bending-overblowing/1377). It is a schematic view, not an acoustics simulation.
+## Early access
 
-## Lead form
+All Get Early Access buttons open the same modal. Email is required; harp key is the only optional field. Validation, confirmation, Escape, backdrop dismissal, and focus restoration are implemented with React and the native dialog element. The preview explicitly sends and stores nothing. A production lead endpoint remains outside this assignment’s scope.
 
-The common “Get Early Access” action opens a modal with required email and optional harp key. Validation, keyboard dismissal, focus management, and a confirmation preview are implemented. The form explicitly does not send or store email. Connecting a lead endpoint and production privacy/consent copy remains a launch integration task, outside the assignment scope.
+## Check and package
 
-## Validation
+```sh
+npm test
+npx playwright install chromium
+npm run test:e2e
+npm run package
+```
 
-- 126 generated test-signal measurements across 21 targets at 44.1 and 48 kHz; all within one cent of expected pitch, worst error approximately 0.64 cents. Test signals are used only in verification, not included in the page experience.
-- Browser microphone pipeline checked with a simulated media stream: −28 cents, +28 cents, zero, silence, and explicit track release all passed.
-- Permission denial and cancellation of a pending microphone request passed; late streams were released.
-- Target switching, form validation, confirmation, and keyboard dismissal checked.
-- Responsive layout rechecked at 11 widths from 320 to 1440 pixels with no horizontal overflow. At 390 × 844, the microphone button is fully visible at 720–772 pixels from the top (previously 938–990).
-- The browser-prototype badge is 11px through 1100px viewport width and 12px above that; the supporting prototype note is also at least 11px. All checked widths retain the full badge without clipping.
-- Desktop and mobile visuals inspected; automated WCAG A/AA checks with axe-core reported no violations at 390px and 1440px.
+`npm run package` builds the React app, generates a self-contained `Ratatune.html`, and creates `Ratatune-assignment.zip`. It includes editable React source, the lockfile, configuration, tests, production `dist/`, the standalone page, desktop/mobile views, and the four-sentence `Submission notes.md`. Dependencies, Git history, test output, and the internal assessment audit are excluded. The archive is decompressed and compared with its input files before completion. The generated files should be rebuilt after source edits.
 
-Physical-instrument validation remains pending: no harmonica was available for this review. No physical harmonica or device microphone recording was used for testing. The generated-signal and simulated-stream results do not establish reliability with a real harmonica, or replace a complete assistive-technology audit.
+The standalone HTML works without a build step; microphone permission still depends on the browser and secure context. HTTPS or localhost is the reliable preview environment.
 
-When a harp is available, select its key and bend target, allow the microphone, and hold single 3-draw bends while checking that the reading follows pitch changes, remains steady on a held note, clears in silence, and stops when requested. Compare against an independent tuner or measured recording; record the device, browser, harp key, room conditions, octave errors, and any dropouts before making a real-instrument accuracy claim.
+## Migration verification
 
-## Reference context
+- `npm run build` and all 12 detector/capture unit tests passed, including 126 generated pitch measurements across 21 targets, two sample rates, and flat/on-target/sharp offsets (within one cent).
+- Main-page text was compared with the original; all content matched after ignoring layout whitespace. Section and microphone geometry matched exactly at 390, 768, and 1440px.
+- Browser checks covered all three CTAs, invalid/valid form input, confirmation, field reset, Escape, focus return, target selection, live −28/+28/0-cent readings, silence, mic stopping, late permission cancellation, form/background/page-exit cleanup, and the instrument’s live highlight.
+- Scroll reversal, keyboard inspection, reduced motion, production hydration, the packaged standalone page, and JavaScript-disabled production HTML were checked in the browser.
+- Across 45 scroll positions at 320, 390, 768, 1024, and 1440px, no content overlaps, unexpected hidden instrument states, or horizontal overflow were found. Axe WCAG A/AA checks reported zero violations on mobile, desktop, and the open dialog. All six supplied screenshots were refreshed from the React build.
+- The local shell sandbox prevented Playwright CLI from launching Chromium. Browser scenarios were exercised through the available browser automation session instead; the CLI suite is included for a normal local/CI environment.
 
-- User-supplied **Mock Assessment .pdf**, all five pages, and Amrita’s follow-up approving a simple microphone prototype.
-- [Ratatune’s public page](https://ratatune.com/h2): feature positioning and headline. The brief’s “Get Early Access” wording is used throughout.
-- [HOHNER tuning charts](https://hohner.de/fileadmin/cat/2020/catalogs/Harmonicas/pdf/complete.pdf): standard Richter note layout.
-- [MDN: microphone capture](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia) and [MDN: waveform analysis](https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/getFloatTimeDomainData): browser audio behavior.
+A real harmonica and microphone check is still required before claiming real-instrument accuracy. Hold single 3-draw bends, compare with an independent tuner, and note octave errors, instability, and silence/dropout behavior along with the harp key, device, browser, and room conditions.
+
+## References
+
+The user-supplied five-page **Mock Assessment .pdf** and Amrita’s follow-up approving a simple live microphone prototype govern the assignment. The required explanation is in `Submission notes.md`.
+
+- [React build setup](https://react.dev/learn/build-a-react-app-from-scratch) and [Vite documentation](https://vite.dev/guide/).
+- [Ratatune’s public page](https://ratatune.com/h2): positioning and headline.
+- [HOHNER tuning charts](https://hohner.de/fileadmin/cat/2020/catalogs/Harmonicas/pdf/complete.pdf) and [bending explanation](https://my.hohner.de/t/harmonica-terminology-3-bending-overblowing/1377): standard Richter layout and schematic paired reeds.
+- [MDN microphone capture](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia) and [waveform analysis](https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/getFloatTimeDomainData).

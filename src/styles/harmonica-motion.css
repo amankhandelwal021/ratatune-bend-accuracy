@@ -1,0 +1,113 @@
+/* An independent visual layer: no original content changes size or position. */
+.harmonica-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  overflow: clip;
+  contain: layout style;
+}
+.harmonica-stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1000px;
+  height: 220px;
+  transform-origin: center;
+  visibility: hidden;
+  will-change: transform, opacity;
+}
+.harmonica-stage.is-ready {
+  visibility: visible;
+}
+.harmonica-touch {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 35%;
+  color: inherit;
+  background: transparent;
+  cursor: grab;
+  pointer-events: none;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+.harmonica-stage.is-docked .harmonica-touch {
+  pointer-events: auto;
+}
+.harmonica-touch:active {
+  cursor: grabbing;
+  transform: none;
+}
+.harmonica-touch:focus-visible {
+  outline: 3px solid #a55731;
+  outline-offset: -10px;
+}
+.harmonica-object {
+  width: 100%;
+  height: 100%;
+  transform: perspective(1200px) rotateX(var(--harp-tilt-x, 0deg))
+    rotateY(var(--harp-tilt-y, 0deg));
+  transform-style: preserve-3d;
+}
+.harmonica-object svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.harp-upper {
+  transform: translateY(var(--harp-open-top, 0px));
+}
+.harp-lower {
+  transform: translateY(var(--harp-open-bottom, 0px));
+}
+.harp-reeds {
+  transform: translateY(var(--harp-open-reeds, 0px));
+}
+.harp-glint {
+  transform: translateX(var(--harp-light, 500px));
+}
+.harp-breath {
+  opacity: var(--harp-breath, 0);
+  fill: var(--harp-tone, #dceca2);
+}
+.harmonica-layer.is-hidden {
+  visibility: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  .harmonica-stage,
+  .harmonica-object,
+  .harp-upper,
+  .harp-lower,
+  .harp-reeds,
+  .harp-glint {
+    will-change: auto;
+  }
+}
+
+/* The same instrument becomes a close-up and an explanatory cutaway. */
+.harp-camera {
+  transform: translate(500px, 110px) scale(var(--harp-camera-scale, 1))
+    translate(var(--harp-camera-x, -500px), -110px);
+}
+.harp-focus {
+  opacity: var(--harp-focus, 0);
+}
+.harp-airflow {
+  opacity: var(--harp-airflow, 0);
+  stroke-dasharray: 9 8;
+  stroke-dashoffset: var(--harp-flow-offset, 0);
+}
+.harp-draw-reeds {
+  transform: translateY(var(--harp-draw-plate, 0px));
+}
+.harp-reed-third-upper {
+  transform-origin: 284px 82px;
+  transform: rotate(var(--harp-reed-upper, 0deg));
+}
+.harp-reed-third-lower {
+  transform-origin: 284px 169px;
+  transform: rotate(var(--harp-reed-lower, 0deg));
+}

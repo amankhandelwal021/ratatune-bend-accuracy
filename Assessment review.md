@@ -1,3 +1,5 @@
+> React migration, 9 September 2026: this file retains the earlier assessment audit as historical context. The current editable implementation is under `src/`, built with React and Vite; references below to standalone source files describe the pre-migration version. See README.md for current run/build/package commands, migration checks, and the still-pending physical-harmonica validation. The design, content, and three-section structure remain preserved. No new stakeholder approval or external submission has been made.
+
 # Assessment review — 9 September 2026
 
 Internal review for Aman. This checklist is kept outside the submission ZIP; the required submitted explanation remains four sentences.
